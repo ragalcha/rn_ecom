@@ -1,2 +1,2 @@
 # rn_ecom
-commerce website build in express.js
+commerce website build in express.js and react
