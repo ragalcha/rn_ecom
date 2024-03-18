@@ -10,6 +10,13 @@ const customerSchema = new Schema(
 			type: String,
 			required: true,
 		},
+
+		userName: {
+			type: String,
+			required: true,
+			unique: true,
+		}, 
+
 		email: {
 			type: String,
 			required: true,
@@ -45,8 +52,13 @@ const customerSchema = new Schema(
 			type: String,
 			required: true,
 		},
+		userRole: {
+			type: String,
+			enum: ["Customer", "Admin", "Seller"],
+			default: "Customer",
+		}
 	},
 	{ timestamps: true }
 );
 
-export const Customer = mongoose.model("Customer", customerSchema);
+export const Customer =  mongoose.models.Customer || mongoose.model("Customer", customerSchema);

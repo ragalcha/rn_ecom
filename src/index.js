@@ -1,13 +1,10 @@
 // import mongoose from "mongoose";
-import express from 'express';
-const app = express()
-const port = 3007
 import dotenv from "dotenv";
-
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
+import dbConection from "./db/db.js";
+import { app } from "./app.js";
+const port = 3002
+dotenv.config({path: "./env"});
+dbConection()
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
