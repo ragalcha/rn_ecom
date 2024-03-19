@@ -2,31 +2,32 @@ import mongoose, { Schema } from "mongoose";
 
 const sellerSchema = new Schema(
 	{
-		name: {
-			type: String,
-			required: true,
-		},
 		email: {
 			type: String,
 			required: true,
 			unique: true,
 		},
-		phone: {
+		companyName: {
 			type: String,
-			required: true,
-			unique: true,
 		},
-		password: {
+		businessRegistrationNumber: {
 			type: String,
-			required: true,
 		},
-		companyName: String,
-		businessRegistrationNumber: String,
-		taxIdentificationNumber: String,
-		businessAddress: String,
-		bankName: String,
-		bankAccountNumber: String,
-		IFSC: String,
+		taxIdentificationNumber: {
+			type: String,
+		},
+		businessAddress: {
+			type: String,
+		},
+		bankName: {
+			type: String,
+		},
+		bankAccountNumber: {
+			type: String,
+		},
+		IFSC: {
+			type: String,
+		},
 		productCategories: [
 			{
 				type: Schema.Types.ObjectId,
