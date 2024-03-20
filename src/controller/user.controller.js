@@ -162,5 +162,49 @@ const logoutUser = asyncHandler(async (req, res) => {
 		.json(new ApiResponse(200, {}, "User logged out"));
 });
 
+// address controllers
+const takeAddress = asyncHandler(async (req, res) => {
+	// take input
+	const { street, city, state, postalCode, country } = req.body;
+	console.log(street, city, state, postalCode, country);
+	if (!street || !city || !state || !postalCode || !country) {
+		throw new ApiError(400, "All address fields are required");
+	}
+
+	// save to database
+	const newAddress = {
+		street,
+		city,
+		state,
+		postalCode,
+		country,
+	};
+
+	const updatedUser = await Customer.findOneAndUpdate(
+		{ _id: req.user._id }, // Query to find the user by ID
+		{ $push: { addresses: newAddress } }, // Update to push the new address
+		{ new: true } // Return the updated document
+	);
+
+	// send response
+	return res
+		.status(200)
+		.json(new ApiResponse(200, updatedUser, "Address added successfully"));
+});
+
+const getAddress = asyncHandler(async (req, res) => {
+	const user = await Customer.findById(req.user._id);
+
+	return res
+		.status(200)
+		.json(
+			new ApiResponse(
+				200,
+				user.addresses,
+				"addresses fetched successfully"
+			)
+		);
+});
+
 // export
-export { registerUser, loginUser, logoutUser };
+export { registerUser, loginUser, logoutUser, takeAddress, getAddress };
