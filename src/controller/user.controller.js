@@ -116,7 +116,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 	// check if user is a seller
 	if (loggedInUser.userRole === "Seller") {
-		const seller = await Seller.findOne({ email: loggedInUser.email });
+		const seller = await Seller.findOne({ customerId: loggedInUser._id });
 		if (seller) {
 			allDetails.push(seller);
 		}
@@ -162,7 +162,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 		.json(new ApiResponse(200, {}, "User logged out"));
 });
 
-// address controllers
+// address controller
 const takeAddress = asyncHandler(async (req, res) => {
 	// take input
 	const { street, city, state, postalCode, country } = req.body;
@@ -189,22 +189,40 @@ const takeAddress = asyncHandler(async (req, res) => {
 	// send response
 	return res
 		.status(200)
-		.json(new ApiResponse(200, updatedUser, "Address added successfully"));
-});
-
-const getAddress = asyncHandler(async (req, res) => {
-	const user = await Customer.findById(req.user._id);
-
-	return res
-		.status(200)
 		.json(
 			new ApiResponse(
 				200,
-				user.addresses,
-				"addresses fetched successfully"
+				updatedUser.addresses,
+				"Address added successfully"
 			)
 		);
 });
 
+const getUserDetails = asyncHandler(async (req, res) => {
+	const user = await Customer.findById(req.user._id).select(
+		"-password -refreshToken"
+	);
+
+	const allDetails = [user];
+
+	// check if user is a seller
+	if (user.userRole === "Seller") {
+		const seller = await Seller.findOne({ customerId: user._id });
+		if (seller) {
+			allDetails.push(seller);
+		}
+	}
+
+	return res.status(200).json(
+		new ApiResponse(
+			200,
+			{
+				user: allDetails,
+			},
+			"User details fetched successfully"
+		)
+	);
+});
+
 // export
-export { registerUser, loginUser, logoutUser, takeAddress, getAddress };
+export { registerUser, loginUser, logoutUser, takeAddress, getUserDetails };

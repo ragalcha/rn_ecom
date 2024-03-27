@@ -15,7 +15,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// import router user
+// import routes
 import userRouter from "./routes/user.routes.js";
+import sellerRouter from "./routes/seller.routes.js";
+
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/seller", sellerRouter);
+
 export { app };

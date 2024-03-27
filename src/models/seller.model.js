@@ -2,10 +2,9 @@ import mongoose, { Schema } from "mongoose";
 
 const sellerSchema = new Schema(
 	{
-		email: {
-			type: String,
-			required: true,
-			unique: true,
+		customerId: {
+			type: Schema.Types.ObjectId,
+			ref: "Customer",
 		},
 		companyName: {
 			type: String,
