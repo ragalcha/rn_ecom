@@ -17,7 +17,7 @@ const registerUser = asyncHandler(async (req, res) => {
 		req.body.phone,
 		req.body.password,
 	];
-
+    console.log(firstName, lastName, userName, email, phone, password);
 	if (firstName && lastName && userName && email && phone && password) {
 		try {
 			// check user exist or not
@@ -32,9 +32,14 @@ const registerUser = asyncHandler(async (req, res) => {
 			if (existingUser) {
 				// User with the provided username, email, or phone number already exists
 				// Handle the case accordingly, such as returning an error response
-				throw new ApiError(
-					400,
-					"User with email or username or phone already exists"
+				return res
+				.status(401)
+				.json(
+					new ApiResponse(
+						401,
+						existingUser,
+						"User with email or username or phone already exists"
+					)
 				);
 			}
 
@@ -74,7 +79,15 @@ const registerUser = asyncHandler(async (req, res) => {
 			throw new ApiError(400, error.message);
 		}
 	} else {
-		throw new ApiError(400, "All fields are required");
+		return res
+				.status(401)
+				.json(
+					new ApiResponse(
+						401,
+						 "",
+						"All field are required"
+					)
+				);
 	}
 });
 
@@ -83,10 +96,21 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
 	// take data
 	const { email, userName, password } = req.body;
-
-	// username or email
+//    console.log("i am email-->",email,req.body.email);
+//    console.log("i am user name-->",userName,req.body.userName);
+//    console.log("i am password-->",password,req.body.password);
+// 	// username or email
 	if (!userName && !email) {
-		throw new ApiError(400, "Username or email is required");
+		// console.log("username or email is required");
+		return res
+		.status(401)
+		.json(
+			new ApiResponse(
+				401,
+				"",
+				"Username or email is required"
+			)
+		);
 	}
 
 	// check whether user exist in customer database or not
@@ -95,13 +119,28 @@ const loginUser = asyncHandler(async (req, res) => {
 	});
 
 	if (!user) {
-		throw new ApiError(404, "user does not exist");
+		return res
+		.status(401)
+		.json(
+			new ApiResponse(
+				401,
+				"",
+				"Invalid user credentials: user not exit"
+			)
+		);
 	}
-
 	// check if password correct or not
 	const isPasswordValid = await user.isPasswordCorrect(password);
 	if (!isPasswordValid) {
-		throw new ApiError(401, "Invalid user credentials");
+		return res
+		.status(401)
+		.json(
+			new ApiResponse(
+				401,
+				"",
+				"Invalid user credentials: wrong password"
+			)
+		);
 	}
 
 	// access token and refresh token
