@@ -94,4 +94,29 @@ const addProduct = asyncHandler(async (req, res) => {
 		.json(new ApiResponse(200, product, "product added successfully"));
 });
 
-export { addProduct };
+const updateProduct = asyncHandler(async (req, res) => {
+	if (req.user.userRole !== "Seller") {
+		throw new ApiError(401, "You are not a seller");
+	}
+
+	const { product_Id } = req.params; // taking productId from url
+	const updateFields = req.body;
+
+	try {
+		const result = await Product.updateOne(
+			{ productId: product_Id }, // Match product by ID
+			{ $set: updateFields } // Update only provided fields
+		);
+
+		if (result.matchedCount === 0) {
+			res.status(404).json({ error: "Product not found" });
+		} else {
+			res.status(200).json({ message: "Product updated successfully" });
+		}
+	} catch (error) {
+		console.error("Error occurred while updating product:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+export { addProduct, updateProduct };

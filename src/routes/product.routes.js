@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addProduct } from "../controller/product.controller.js";
+import { addProduct, updateProduct } from "../controller/product.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -15,5 +15,6 @@ router.route("/add-product").post(
 	]),
 	addProduct
 );
+router.route("/update-product/:product_Id").put(verifyJWT, updateProduct);
 
 export default router;
