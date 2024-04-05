@@ -119,4 +119,27 @@ const updateProduct = asyncHandler(async (req, res) => {
 	}
 });
 
-export { addProduct, updateProduct };
+const deleteProduct = asyncHandler(async (req, res) => {
+	if (req.user.userRole !== "Seller") {
+		throw new ApiError(401, "You are not a seller");
+	}
+
+	const { product_Id } = req.params;
+
+	try {
+		const result = await Product.deleteOne({
+			productId: product_Id,
+		});
+
+		if (result.deletedCount === 0) {
+			res.status(404).json({ error: "Product not found" });
+		} else {
+			res.status(200).json({ message: "Product deleted successfully" });
+		}
+	} catch (error) {
+		console.error("Error occurred while deleting product:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+});
+
+export { addProduct, updateProduct, deleteProduct };
