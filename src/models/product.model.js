@@ -2,6 +2,15 @@ import mongoose, { Schema } from "mongoose";
 
 const productSchema = new Schema(
 	{
+		sellerId: {
+			type: Schema.Types.ObjectId,
+			ref: "Seller",
+		},
+		productId: {
+			type: Number,
+			required: true,
+			unique: true,
+		},
 		name: {
 			type: String,
 			required: true,

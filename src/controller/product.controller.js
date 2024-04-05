@@ -3,9 +3,18 @@ import { ApiError } from "../utils/ApiError.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Product } from "../models/product.model.js";
+import { Seller } from "../models/seller.model.js";
 
 const addProduct = asyncHandler(async (req, res) => {
+	let loggedInSeller;
+	if (req.user.userRole === "Seller") {
+		loggedInSeller = await Seller.findOne({ customerId: req.user._id });
+	} else {
+		throw new ApiError(401, "You are not a seller");
+	}
+
 	const {
+		productId,
 		name,
 		description,
 		price,
@@ -15,6 +24,7 @@ const addProduct = asyncHandler(async (req, res) => {
 	} = req.body;
 
 	console.log(
+		productId,
 		name,
 		description,
 		price,
@@ -24,6 +34,7 @@ const addProduct = asyncHandler(async (req, res) => {
 	);
 
 	if (
+		!productId ||
 		!name ||
 		!description ||
 		!price ||
@@ -60,6 +71,8 @@ const addProduct = asyncHandler(async (req, res) => {
 	}
 
 	const product = await Product.create({
+		sellerId: loggedInSeller._id,
+		productId,
 		name,
 		description,
 		price,
@@ -68,6 +81,13 @@ const addProduct = asyncHandler(async (req, res) => {
 		maxOrderQuantity,
 		productImages: uploadedImagesLink,
 	});
+
+	// addding produc id in seller records
+	const productsBySeller = loggedInSeller.productPortfolio;
+	productsBySeller.push(product._id);
+
+	loggedInSeller.productPortfolio = productsBySeller;
+	await loggedInSeller.save({ validateBeforeSave: false });
 
 	return res
 		.status(200)
