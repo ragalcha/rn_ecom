@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
 	addProduct,
 	deleteProduct,
+	getMyProducts,
 	updateProduct,
 } from "../controller/product.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -21,5 +22,6 @@ router.route("/add-product").post(
 );
 router.route("/update-product/:product_Id").put(verifyJWT, updateProduct);
 router.route("/delete-product/:product_Id").delete(verifyJWT, deleteProduct);
+router.route("/get-my-products").get(verifyJWT, getMyProducts);
 
 export default router;

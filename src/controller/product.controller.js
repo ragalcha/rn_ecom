@@ -161,4 +161,37 @@ const deleteProduct = asyncHandler(async (req, res) => {
 	}
 });
 
-export { addProduct, updateProduct, deleteProduct };
+const getMyProducts = asyncHandler(async (req, res) => {
+	let loggedInSeller;
+	if (req.user.userRole === "Seller") {
+		loggedInSeller = await Seller.findOne({ customerId: req.user._id });
+	} else {
+		throw new ApiError(401, "You are not a seller");
+	}
+
+	const productsBySeller = loggedInSeller.productPortfolio;
+	let allProducts = [];
+
+	for (const productId of productsBySeller) {
+		const product = await Product.findById(productId);
+		if (product) {
+			allProducts.push(product);
+		}
+	}
+
+	if (!allProducts || !allProducts.length) {
+		return res.status(404).json({ message: "Nothing to fetch" });
+	}
+
+	return res
+		.status(200)
+		.json(
+			new ApiResponse(
+				200,
+				allProducts,
+				"all products fetched successfully"
+			)
+		);
+});
+
+export { addProduct, updateProduct, deleteProduct, getMyProducts };
