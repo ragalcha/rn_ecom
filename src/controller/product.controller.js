@@ -82,7 +82,7 @@ const addProduct = asyncHandler(async (req, res) => {
 		productImages: uploadedImagesLink,
 	});
 
-	// addding produc id in seller records
+	// addding product id in seller records
 	const productsBySeller = loggedInSeller.productPortfolio;
 	productsBySeller.push(product._id);
 
@@ -120,16 +120,35 @@ const updateProduct = asyncHandler(async (req, res) => {
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
-	if (req.user.userRole !== "Seller") {
+	let loggedInSeller;
+	if (req.user.userRole === "Seller") {
+		loggedInSeller = await Seller.findOne({ customerId: req.user._id });
+	} else {
 		throw new ApiError(401, "You are not a seller");
 	}
 
 	const { product_Id } = req.params;
 
 	try {
+		const product = await Product.findOne({ productId: product_Id });
+		if (!product) {
+			res.status(404).json({ error: "Product not found" });
+		}
+
 		const result = await Product.deleteOne({
 			productId: product_Id,
 		});
+
+		// removing product id from seller records
+		const productsBySeller = loggedInSeller.productPortfolio;
+
+		let index = productsBySeller.indexOf(product._id);
+		if (index !== -1) {
+			productsBySeller.splice(index, 1);
+		}
+
+		loggedInSeller.productPortfolio = productsBySeller;
+		await loggedInSeller.save({ validateBeforeSave: false });
 
 		if (result.deletedCount === 0) {
 			res.status(404).json({ error: "Product not found" });
