@@ -1,4 +1,5 @@
 export const  DB_NAME = "ecom";
 export const OPTIONS = {
-    httpOnly: true,
+    httpOnly: false,
+    secure: true,
 }   
